@@ -11,4 +11,6 @@ urlpatterns = patterns('',
     url(r'^candidates$', views.candidates.as_view(), name='candidates'),
     url(r'^intw-schedules$', views.intw_schedules.as_view(), name='candidates'),
     url(r'^employees$', views.employees.as_view(), name='employees'),
+    url(r'^leave$', views.leave.as_view(), name='leave'),
+    url(r'^apply_leave$', views.apply_leave.as_view(), name='apply_leave'),
 )

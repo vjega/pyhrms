@@ -2,13 +2,72 @@
 {% load staticfiles %}
 {% block angular-scripts %}
 <script>
-    var hrmsApp = angular.module('hrmsApp', []);
-    hrmsApp.controller('EmpCtrl', function ($scope, $http){
+    var hrmsApp = angular.module('hrmsApp', ['ngTable']);
+    hrmsApp.controller('EmpCtrl', function ($scope, $http, NameService, ngTableParams){
+        // var data = NameService.data;
+        // console.log(data);
         $scope.granule = 'Employee';
         $scope.emplist = [];
         $http.get('/api/employee/?format=json').success(function(data){
             $scope.emplist = data;
         })
+        /*
+         $scope.tableParams = new ngTableParams(
+              {
+                page: 1,            // show first page
+                count: 10,           // count per page
+                sorting: {name:'asc'}
+              },
+              {
+                total: 0, // length of data
+                getData: function($defer, params) {
+                  NameService.getData($defer,params,$scope.filter);
+                }
+            });
+            
+            $scope.$watch("filter.$", function () {
+                $scope.tableParams.reload();
+            });
+*/
+        });
+
+    hrmsApp.service("NameService", function($http, $filter){
+          function filterData(data, filter){
+            return $filter('filter')(data, filter)
+          }
+          
+          function orderData(data, params){
+            return params.sorting() ? $filter('orderBy')(data, params.orderBy()) : filteredData;
+          }
+          
+          function sliceData(data, params){
+            return data.slice((params.page() - 1) * params.count(), params.page() * params.count())
+          }
+            var service = {
+            cachedData:[],
+            getData:function($defer, params, filter){
+              if(service.cachedData.length>0){
+                console.log("using cached data")
+                var filteredData = filterData(service.cachedData,filter);
+                var transformedData = sliceData(orderData(filteredData,params),params);
+                params.total(filteredData.length)
+                $defer.resolve(transformedData);
+              }else{
+                console.log("fetching data")
+                //$http.get('/api/employee/?format=json').success(function(data){
+                  $http.get("/api/employee/?format=json").success(function(data){
+                  angular.copy(data,service.cachedData)
+                  params.total(data.length)
+                  var filteredData = $filter('filter')(data, filter);
+                  var transformedData = transformData(data,filter,params)
+                  
+                  $defer.resolve(transformedData);
+                });  
+              }
+              
+            }
+          };
+          return service; 
     });
 </script>
 {%endblock angular-scripts %}
@@ -32,24 +91,23 @@
                 <!-- /.panel-heading -->
                 <div class="panel-body">
                     <div class="dataTable_wrapper">
-                        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
-                            <thead>
-                                <tr>
-                                    <th>Employee Code</th>
-                                    <th>Name</th>
-                                    <th>Qlfication</th>
-                                    <th>Designation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="emp in emplist">
-                                    <td>{{emp.employee_code}}</td>
-                                    <td>{{emp.name}}</td>
-                                    <td>{{emp.qualification}}</td>
-                                    <td>{{emp.designation}}</td>
-                                </tr>
-                            </tbody>
+                        <p>Filter: <input class="form-control" type="text" ng-model="filter.$" /></p>
+                        <table class="table table-striped table-bordered table-hover" id="dataTables-example" ng-table="tableParams" show-filter="true" class="table">
+                            <tr ng-repeat="emp in emplist">
+                                <td data-title="'Employee Code'" sortable="'employee_code'">{{emp.employee_code}}</td>
+                                <td data-title="'Name'" sortable="'name'" >{{emp.name}}</td>
+                                <td data-title="'Qualification'" sortable="'qualification'">{{emp.qualification}}</td>
+                                <td data-title="'Designation'" sortable="'designation'">{{emp.designation}}</td>
+                            </tr>
                         </table>
+                        <script type="text/ng-template" id="custom/pager">
+                            <ul class="pager ng-cloak">
+                                <li ng-repeat="page in pages" ng-class="{'disabled': !page.active, 'previous': page.type == 'prev', 'next': page.type == 'next'}" ng-show="page.type == 'prev' || page.type == 'next'" ng-switch="page.type">
+                                    <a ng-switch-when="prev" ng-click="params.page(page.number)" href="">&laquo; Previous</a>
+                                    <a ng-switch-when="next" ng-click="params.page(page.number)" href="">Next &raquo;</a>
+                                </li>
+                            </ul>
+                        </script>
                     </div>
                     <!-- /.table-responsive -->
                 </div>

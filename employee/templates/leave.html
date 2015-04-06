@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block angular-scripts %}
+<script>
+    var hrmsApp = angular.module('hrmsApp', ['ngTable']);
+    hrmsApp.controller('EmpCtrl', function ($scope, $http, ngTableParams){
+        $scope.granule = 'Leave';
+        $scope.emplist = [];
+        $http.get('/api/leave/?format=json').success(function(data){
+            $scope.emplist = data;
+        })
+    });
+
+  window.TTS = window.TTS || {}
+  TTS.forms = TTS.forms || {}
+
+  TTS.forms.addnewrecord = function (){
+      alert("hai test value")
+  };
+
+  $("#page-wrapper").on("click","#addrec",function(){
+      console.log("tesst");
+  });
+
+</script>
+
+<style>
+  #addrec:hover{
+      cursor: pointer;
+  }
+</style>
+
+{%endblock angular-scripts %}
+
+{% block inner-page %}
+{% verbatim %}
+<div id="page-wrapper" ng-app="hrmsApp" ng-controller="EmpCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <h2 class="page-header">{{granule}}</h2>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {{granule}} List <span id="addrec"><i class="fa fa-plus-square fa-lg"></i></span>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="dataTable_wrapper">
+                        <p>Filter: <input class="form-control" type="text" ng-model="filter.$" /></p>
+                        <table class="table table-striped table-bordered table-hover" id="dataTables-example" ng-table="tableParams" show-filter="true" class="table">
+                            <tr ng-repeat="emp in emplist">
+                                <td data-title="'Code'" sortable="'code'">{{emp.code}}</td>
+                                <td data-title="'Name'" sortable="'name'" >{{emp.name}}</td>
+                                <td data-title="'No of Days'" sortable="'no_of_days'">{{emp.no_of_days}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /#page-wrapper -->
+{% endverbatim %}
+{%endblock inner-page%}
+
+

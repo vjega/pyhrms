@@ -1,6 +1,6 @@
 from rest_framework import serializers, viewsets
 from django.contrib.auth.models import User
-from api.models import Employee
+from api.models import Employee,Leave,LeaveLedger
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -23,3 +23,25 @@ class EmployeeSerializer(serializers.ModelSerializer):
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
+
+# Serializers define the API representation.
+class LeaveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Leave
+        fields = ('code','name', 'no_of_days')
+
+# ViewSets define the view behavior.
+class LeaveViewSet(viewsets.ModelViewSet):
+    queryset = Leave.objects.all()
+    serializer_class = LeaveSerializer
+
+# Serializers define the API representation.
+class ApplyLeaveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaveLedger
+        fields = ('leave_code','leave_summary','from_date','to_date')
+
+# ViewSets define the view behavior.
+class ApplyLeaveViewSet(viewsets.ModelViewSet):
+    queryset = LeaveLedger.objects.all()
+    serializer_class = ApplyLeaveSerializer

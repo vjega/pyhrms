@@ -22,3 +22,11 @@ class intw_schedules(View):
 class employees(View):
     def get(self, request):
         return render(request, 'employees.html')
+
+class leave(View):
+    def get(self, request):
+        return render(request, 'leave.html')
+
+class apply_leave(View):
+    def get(self, request):
+        return render(request, 'apply_leave.html')

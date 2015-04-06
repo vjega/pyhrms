@@ -2,12 +2,14 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from rest_framework import routers
 
-from api.views.employee import UserViewSet, EmployeeViewSet
+from api.views.employee import UserViewSet, EmployeeViewSet, LeaveViewSet, ApplyLeaveViewSet
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'employee', EmployeeViewSet)
+router.register(r'leave', LeaveViewSet)
+router.register(r'apply_leave', ApplyLeaveViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
